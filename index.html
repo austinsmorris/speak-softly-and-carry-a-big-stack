@@ -50,7 +50,7 @@
     <p>
       <small>
         <a href="https://github.com/austinsmorris">Austin Morris</a> / <a href="https://twitter.com/austinsmorris">@austinsmorris</a><br>
-        Slides: <a href="https://austinsmorris.github.io/speak-softly-and-carry-a-big-stack">https://austinsmorris.github.io/speak-softly-and-carry-a-big-stackk</a><br>
+        Slides: <a href="https://austinsmorris.github.io/speak-softly-and-carry-a-big-stack">https://austinsmorris.github.io/speak-softly-and-carry-a-big-stack</a><br>
       </small>
     </p>
   </section>
@@ -75,9 +75,16 @@
       <h2>Now the good news...</h2>
     </section>
 
-    <!--todo = talk about what we're trying to accomplish here...-->
     <section>
-      <h2>High Performance = </h2>
+      <h2>High Performance is not hard</h2>
+    </section>
+
+    <section>
+      <h2>High Performance = High Traffic</h2>
+    </section>
+
+    <section>
+      <h2>High Performance = High Availability</h2>
     </section>
   </section>
 
@@ -158,7 +165,7 @@
         opcache.max_accelerated_files=4000
       </code></pre>
       <ul>
-        <li>How much files (scripts) are cached.</li>
+        <li>How many files (scripts) are cached.</li>
         <li>How big is your code base?</li>
       </ul>
       <pre><code>
@@ -214,30 +221,24 @@
         worker_processes 1;
 
         events {
-          worker_connections 1024;
           multi_accept on;
+          worker_connections 1024;
         }
+      </code></pre>
+    </section>
 
+    <section>
+      <p><code>nginx.conf</code> (cont.)</p>
+      <pre><code>
         http {
           sendfile on;
           tcp_nopush on;
           keepalive_timeout 65;
           server_tokens off;
-
           include mime.types;
           default_type application/octet-stream;
-
-          proxy_buffer_size   128k;
-          proxy_buffers   4 256k;
-          proxy_busy_buffers_size   256k;
-
-          fastcgi_buffers 16 16k;
-          fastcgi_buffer_size 32k;
-
-          client_max_body_size 1000m;
-
           access_log /usr/local/var/log/nginx/access.log;
-          error_log /usr/local/var/log/nginx/error.log debug;
+          error_log /usr/local/var/log/nginx/error.log;
 
           upstream php-fpm-socket {
             server unix:/tmp/php-fpm.sock;
@@ -283,10 +284,6 @@
         pm.max_spare_servers = 15
         pm.max_requests = 1000
         pm.status_path = /php_status
-
-        request_terminate_timeout = 0
-        request_slowlog_timeout = 0
-        slowlog = /usr/local/var/log/slow.log
       </code></pre>
     </section>
   </section>
@@ -322,13 +319,16 @@
         defaults
           log global
           retries 3
-          option dontlog-normal
-          option splice-auto
           timeout connect 5000ms
           timeout client 5000ms
           timeout server 5000ms
           maxconn 50000
+      </code></pre>
+    </section>
 
+    <section>
+      <p><code>haprox.cfg</code> (cont.)</p>
+      <pre><code>
         frontend tcp_proxy
           bind *:80
           mode tcp
@@ -340,7 +340,12 @@
           # option httpchk HEAD / HTTP/1.1\r\nHost:\ example.com
           server my-server-1 10.0.2.2 check port 80 inter 1000
           server my-server-2 10.0.2.3 check port 80 inter 1000
+      </code></pre>
+    </section>
 
+    <section>
+      <p><code>haprox.cfg</code> (cont.)</p>
+      <pre><code>
         listen stats *:1936
           mode http
           stats enable
@@ -372,9 +377,64 @@
     </section>
 
     <section>
-      <h2>redis is awesome!</h2>
+      <h2>Redis is awesome!</h2>
       <ul>
-        <li></li>
+        <li>In-memory key value store</li>
+        <li>Persist-to-disk</li>
+        <li>Easy setup and configuration</li>
+        <li>Excellent documentation</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Share your sessions</h2>
+      <ul>
+        <li>Sticky sessions cause hot spots</li>
+        <li>Use the phpredis extension with igbinary</li>
+      </ul>
+      <pre><code>
+        extension=igbinary.so
+        extension=redis.so
+      </code></pre>
+    </section>
+
+    <section>
+      <p>redis.conf</p>
+      <br><br>
+      <p>(demo for full effect)</p>
+    </section>
+
+    <section>
+      <p>php.ini</p>
+      <pre><code>
+        session.save_handler = redis
+        session.save_path = "tcp://192.168.0.100:6379"
+      </code></pre>
+    </section>
+
+    <section>
+      <h2>But wait, there's more!</h2>
+    </section>
+
+    <section>
+      <h2>Userland cache</h2>
+      <ul>
+        <li>phpredis provides native access</li>
+        <li>Doctrine driver (using phpredis) for:</li>
+        <ul>
+          <li>Metadata cache</li>
+          <li>Query cache</li>
+          <li>Results cache</li>
+        </ul>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Redis to the Resque!</h2>
+      <ul>
+        <li>Redis is the engine driving resque</li>
+        <li>Use a job queue for anything that is not part of the response</li>
+        <li>php-resque lets your write jobs in php</li>
       </ul>
     </section>
   </section>
