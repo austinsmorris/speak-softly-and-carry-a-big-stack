@@ -43,22 +43,505 @@
 <!-- Any section element inside of this container is displayed as a slide -->
 <div class="slides">
 
-<section>
-  <h1>Speak Softly And Carry A Big Stack</h1>
-  <hr>
-  <p><large>How to leverage open source projects (nginx, haproxy, redis, varnish, etc.) to turbocharge your php application stack</large></p>
-  <p>
-    <small>
-      <a href="https://github.com/austinsmorris">Austin Morris</a> / <a href="https://twitter.com/austinsmorris">@austinsmorris</a><br>
-      Slides: <a href="https://github.com/austinsmorris/speak-softly-and-carry-a-big-stack">https://github.com/austinsmorris/speak-softly-and-carry-a-big-stack</a><br>
-      Presentation: <a href="https://austinsmorris.github.io/speak-softly-and-carry-a-big-stack">https://austinsmorris.github.io/speak-softly-and-carry-a-big-stack</a>
-    </small>
-  </p>
-</section>
+  <section>
+    <h1>Speak Softly And Carry A Big Stack</h1>
+    <hr>
+    <p>How to leverage open source projects (nginx, haproxy, redis, varnish, etc.) to turbocharge your php application stack</p>
+    <p>
+      <small>
+        <a href="https://github.com/austinsmorris">Austin Morris</a> / <a href="https://twitter.com/austinsmorris">@austinsmorris</a><br>
+        Slides: <a href="https://austinsmorris.github.io/speak-softly-and-carry-a-big-stack">https://austinsmorris.github.io/speak-softly-and-carry-a-big-stackk</a><br>
+      </small>
+    </p>
+  </section>
 
-<section>
-  <h1>Questions?</h1>
-</section>
+  <section>
+    <section>
+      <h2>First the bad news...</h2>
+    </section>
+
+    <section>
+      <h2>No PHP</h2>
+    </section>
+
+    <section>
+      <h2>No DB</h2>
+      <p>(In the traditional sense...)</p>
+    </section>
+  </section>
+
+  <section>
+    <section>
+      <h2>Now the good news...</h2>
+    </section>
+
+    <!--todo = talk about what we're trying to accomplish here...-->
+    <section>
+      <h2>High Performance = </h2>
+    </section>
+  </section>
+
+  <section>
+    <section>
+      <h2>php</h2>
+      <p><strong>Problem: </strong> My PHP is too slow!</p>
+    </section>
+
+    <section>
+      <h2>Use the right version!</h2>
+    </section>
+
+    <section>
+      <h2>Use the newest version!</h2>
+      <p>(Or at least PHP 5.5)</p>
+    </section>
+
+    <section>
+      <h2>Try HHVM?</h2>
+      <ul>
+        <li>HHVM is an open-source virtual machine designed for executing programs written in Hack and PHP.</li>
+        <li>HHVM uses a just-in-time (JIT) compilation approach to achieve superior performance while maintaining the development flexibility that PHP provides.</li>
+        <li>Wicked fast!</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>PHP-NG (Next Generation)</h2><br>
+      <ul>
+        <li>Based on a refactored Zend Engine, PHP-NG is already merged into master and will be the basis for the major PHP release.</li>
+        <li>PHP-NG is already twice as fast as PHP 5.6.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Use bytecode cache!</h2>
+      <ul>
+        <li>OPcache for >= PHP 5.5</li>
+        <li><del>APC for <= PHP 5.4</del></li>
+      </ul>
+    </section>
+
+    <section>
+      <p>php.ini settings:</p>
+      <pre><code>
+        opcache.enable=1
+      </code></pre>
+      <ul>
+        <li>Turn it on.</li>
+      </ul>
+        <pre><code>
+          opcache.enable_cli=1
+        </code></pre>
+      <ul>
+        <li>If you want it on the CLI.</li>
+      </ul>
+    </section>
+
+    <section>
+      <pre><code>
+        opcache.memory_consumption=128
+      </code></pre>
+      <ul>
+        <li>How much memory opcache will use (MB).</li>
+        <li>Check your usage with <code>opcache_get_status()</code>.</li>
+      </ul>
+      <pre><code>
+        opcache.interned_strings_buffer=8
+      </code></pre>
+      <ul>
+        <li>How much memory will be used to share immutable strings between processes (MB).</li>
+      </ul>
+    </section>
+
+    <section>
+      <pre><code>
+        opcache.max_accelerated_files=4000
+      </code></pre>
+      <ul>
+        <li>How much files (scripts) are cached.</li>
+        <li>How big is your code base?</li>
+      </ul>
+      <pre><code>
+        opcache.fast_shutdown=1
+      </code></pre>
+      <ul>
+        <li>Turn it on to speed up deconstruction (freeing memory) at the end of each request.</li>
+      </ul>
+    </section>
+
+    <section>
+      <pre><code>
+        opcache.revalidate_freq=60
+      </code></pre>
+      <ul>
+        <li>How often code files are checked for updates (s).</li>
+        <li>Ignore if you use...</li>
+      </ul>
+      <pre><code>
+        opcache.validate_timestamps=0
+      </code></pre>
+      <ul>
+        <li>Never check for updates.</li>
+        <li>Do this if your deployment (cap?) supports it.</li>
+        <li>Much safer then mixing old and new code for 60s.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Use php-fpm with...</h2>
+    </section>
+  </section>
+
+  <section>
+    <section>
+      <h2>nginx</h2>
+      <p><strong>Problem: </strong> My web server is too slow!</p>
+    </section>
+
+    <section>
+      <h2>nginx + php-fpm = rad!</h2>
+      <ul>
+        <li>apache + mod_php is so 2000-late.</li>
+        <li>nginx is fast and efficient.</li>
+        <li>php-fpm can be scaled to maximize hardware capability.</li>
+      </ul>
+    </section>
+
+    <section>
+      <p><code>nginx.conf</code></p>
+      <pre><code>
+        user austin admin;
+        worker_processes 1;
+
+        events {
+          worker_connections 1024;
+          multi_accept on;
+        }
+
+        http {
+          sendfile on;
+          tcp_nopush on;
+          keepalive_timeout 65;
+          server_tokens off;
+
+          include mime.types;
+          default_type application/octet-stream;
+
+          proxy_buffer_size   128k;
+          proxy_buffers   4 256k;
+          proxy_busy_buffers_size   256k;
+
+          fastcgi_buffers 16 16k;
+          fastcgi_buffer_size 32k;
+
+          client_max_body_size 1000m;
+
+          access_log /usr/local/var/log/nginx/access.log;
+          error_log /usr/local/var/log/nginx/error.log debug;
+
+          upstream php-fpm-socket {
+            server unix:/tmp/php-fpm.sock;
+          }
+
+          include /usr/local/etc/nginx/sites-enabled/*;
+        }
+      </code></pre>
+    </section>
+
+    <section>
+      <p><code>sites-enabled/mysite</code></p>
+      <pre><code>
+        server {
+          listen 80;
+          server_name mysite.dev;
+          root /path/to/public/dir;
+          index index.php;
+
+          location / {
+            try_files $uri $uri/ /index.php?$query_string;
+          }
+
+          location ~ \.php$ {
+            fastcgi_pass php-fpm-socket;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+          }
+        }
+      </code></pre>
+    </section>
+
+    <section>
+      <p><code>php-fpm.conf</code></p>
+      <pre><code>
+        [dev]
+        listen = /tmp/php-fpm.sock
+        pm = dynamic
+        pm.max_children = 100
+        pm.start_servers = 10
+        pm.min_spare_servers = 5
+        pm.max_spare_servers = 15
+        pm.max_requests = 1000
+        pm.status_path = /php_status
+
+        request_terminate_timeout = 0
+        request_slowlog_timeout = 0
+        slowlog = /usr/local/var/log/slow.log
+      </code></pre>
+    </section>
+  </section>
+
+  <section>
+    <section>
+      <h2>haproxy</h2>
+      <p><strong>Problem: </strong> I only have one web server!</p>
+    </section>
+
+    <section>
+      <h2>haproxy is sweet!</h2>
+      <ul>
+        <li>Very fast and reliable.</li>
+        <li>Modest hardware can handle a large load.</li>
+        <li>Capable of layer 4 and layer 7 proxying.</li>
+        <li>De-facto standard open source load balancer.</li>
+      </ul>
+    </section>
+
+    <section>
+      <p><code>haprox.cfg</code></p>
+      <pre><code>
+        global
+          maxconn 50000
+          user haproxy
+          group haproxy
+          stats socket /tmp/haproxy
+          node lb1
+          nbproc 1
+          daemon
+
+        defaults
+          log global
+          retries 3
+          option dontlog-normal
+          option splice-auto
+          timeout connect 5000ms
+          timeout client 5000ms
+          timeout server 5000ms
+          maxconn 50000
+
+        frontend tcp_proxy
+          bind *:80
+          mode tcp
+          default_backend my-backend
+
+        backend my-backend
+          mode tcp
+          balance roundrobin
+          # option httpchk HEAD / HTTP/1.1\r\nHost:\ example.com
+          server my-server-1 10.0.2.2 check port 80 inter 1000
+          server my-server-2 10.0.2.3 check port 80 inter 1000
+
+        listen stats *:1936
+          mode http
+          stats enable
+          stats uri /
+          stats hide-version
+          stats auth Username:Password
+      </code></pre>
+    </section>
+
+    <section>
+      <h3>More tips...</h3>
+      <ul>
+        <li>Use keepalived to enable backup LBs.</li>
+        <li>Use DNS to point to multiple LBs.</li>
+        <li>Tune your OS (Linux):</li>
+        <ul>
+          <li>More connections and ports.</li>
+          <li>Tweak TCP time wait.</li>
+          <li>Remove soft and hard file limits.</li>
+        </ul>
+      </ul>
+    </section>
+  </section>
+
+  <section>
+    <section>
+      <h2>redis</h2>
+      <p><strong>Problem: </strong> I have more than one web server!</p>
+    </section>
+
+    <section>
+      <h2>redis is awesome!</h2>
+      <ul>
+        <li></li>
+      </ul>
+    </section>
+  </section>
+
+  <section>
+    <section>
+      <h2>varnish</h2>
+      <p><strong>Problem: </strong> I want more!</p>
+    </section>
+
+    <section>
+      <h2>Web Application Accelerator</h2>
+      <p>a.k.a Caching HTTP Reverse Proxy</p>
+    </section>
+
+    <section>
+      <ol>
+        <li>Send an HTTP Requst.</li>
+        <li>Varnish will fetch and return a response.</li>
+        <li>Resend the HTTP Request</li>
+        <li>Varnish will return a cached response.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Pros</h2>
+      <ul>
+        <li>In-memory (mostly) HTTP cache.</li>
+        <li>Wicked fast static content.</li>
+        <li>Can act as a reverse proxy.</li>
+        <li>Varnish Configuration Language</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Cons</h2>
+      <ul>
+        <li>Must read HTTP (no SSL).</li>
+        <li>No persistence (with experimentation).</li>
+        <li>Tricky debugging.</li>
+        <li>Varnish Configuration Language</li>
+      </ul>
+    </section>
+
+    <section>
+      <p>/etc/default/varnish</p>
+      <pre><code>
+        # Should we start varnishd at boot?  Set to "no" to disable.
+        START=yes
+
+        # Maximum number of open files (for ulimit -n)
+        NFILES=131072
+
+        # Maximum locked memory size (for ulimit -l)
+        MEMLOCK=82000
+
+        DAEMON_OPTS="-a :80 \
+          -T localhost:6082 \
+          -S /etc/varnish/secret \
+          -f /etc/varnish/my.vcl \
+          -s malloc,256m"
+      </code></pre>
+    </section>
+
+    <section>
+      <pre><code>
+        -s malloc,256m
+      </code></pre>
+      <ul>
+        <li>Use malloc if all of your cache will fit in memory.</li>
+      </ul>
+      <pre><code>
+        -s file,/tmp/varnish,500G
+      </code></pre>
+      <ul>
+        <li>Use file if it won't.</li>
+      </ul>
+    </section>
+
+    <section>
+      <p>/etc/varnish/my.vcl</p>
+      <pre><code>
+        vcl 4.0;
+
+        backend server1 {
+          .host = "192.168.0.100";
+          .port = "80";
+        }
+
+        backend server1 {
+          .host = "192.168.0.200";
+          .port = "80";
+        }
+
+        acl purge {
+          "192.168.0.200";
+          "192.168.0.100";
+        }
+
+        sub vcl_init {
+          new backends = directors.round_robin();
+          backends.add_backend(server1);
+          backends.add_backend(server2);
+        }
+      </code></pre>
+    </section>
+
+    <section>
+      <p>/etc/varnish/my.vcl (cont.)</p>
+      <pre><code>
+        sub vcl_recv {
+
+          if (req.method == "PURGE") {
+            if (!client.ip ~ purge) {
+              return (synth(405, "Not allowed"));
+            }
+
+            return (purge);
+          }
+
+          if (req.http.Cache-Control ~ "no-cache") {
+            return (pass);
+          }
+
+          return (hash);
+        }
+      </code></pre>
+    </section>
+
+    <section>
+      <p>/etc/varnish/my.vcl (cont.)</p>
+      <pre><code>
+        sub vcl_backend_response {
+          set beresp.ttl = 120s
+        }
+      </code></pre>
+    </section>
+
+    <section>
+      <h2>Useful Tools</h2>
+      <ul>
+        <li>varnish cli</li>
+        <li>varnishadm</li>
+        <li>varnishhist</li>
+        <li>varnishlog</li>
+        <li>varnishncsa</li>
+        <li>varnishreplay</li>
+        <li>varnishsizes</li>
+        <li>varnishstat</li>
+        <li>varnishtest</li>
+        <li>varnishtop</li>
+      </ul>
+    </section>
+  </section>
+
+  <section>
+    <h2>tl;dr</h2>
+    <ul>
+      <li>Breakdown your architecture into components.</li>
+      <li>Pick components that are really good at what they do.</li>
+      <li>Step 3: Profit!</li>
+    </ul>
+  </section>
+
+  <section>
+    <h1>Questions?</h1>
+  </section>
 
 </div>
 
